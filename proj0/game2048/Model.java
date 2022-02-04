@@ -109,11 +109,55 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+//        board.setViewingPerspective(side);
+        int size = board.size();
+        for (int c = 0; c < size; c++) {
+            int mergeCounter = 0;
+            for (int r = size - 2; r >= 0; r--) {
+                int tCol = side.col(c, r, size);
+                int tRow = side.row(c, r, size);
+                int dCol = side.col(c, size - 1 - mergeCounter, size);
+                int dRow = side.row(c, size - 1 - mergeCounter, size);
+                Tile t = tile(tCol, tRow);
+                Tile d = tile(dCol, dRow);
+                if (t != null) {
+                    if (d != null) {
+                        if (d.value() == t.value()) {
+                            score += d.value() * 2;
+                            board.move(dCol, dRow, t);
+                            mergeCounter += 1;
+                            changed = true;
+                        } else {
+                            while(mergeCounter < size - 1) {
+                                mergeCounter += 1;
+                                dCol = side.col(c, size - 1 - mergeCounter, size);
+                                dRow = side.row(c, size - 1 - mergeCounter, size);
+                                if (tile(dCol, dRow) == null ) {
+                                    board.move(dCol, dRow, t);
+                                    changed = true;
+                                    break;
+                                }
+                                if (tile(dCol, dRow).value() == t.value()) {
+                                    board.move(dCol, dRow, t);
+                                    changed = true;
+                                    break;
+                                }
+                                if (mergeCounter == size - 2) {
+                                    return false;
+                                }
+                            }
+                        }
+                    } else {
+                        board.move(dCol, dRow, t);
+                        changed = true;
+                    }
 
+                }
+            }
+        }
         checkGameOver();
         if (changed) {
             setChanged();
@@ -176,6 +220,34 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        for (int i = 0; i < b.size(); i++) {
+            for (int j = 0; j < b.size(); j++) {
+                int value = b.tile(i, j).value();
+                if (i - 1 >= 0) {
+                    if (value == b.tile(i - 1, j).value()) {
+                        return true;
+                    }
+                }
+                if (j - 1 >= 0) {
+                    if (value == b.tile(i, j - 1).value()) {
+                        return true;
+                    }
+                }
+                if (i + 1 < b.size()) {
+                    if (value == b.tile(i + 1, j).value()) {
+                        return true;
+                    }
+                }
+                if (j + 1 < b.size()) {
+                    if (value == b.tile( i, j + 1).value()) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 

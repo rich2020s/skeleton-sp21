@@ -107,4 +107,23 @@ public class TestUpOnly extends TestUtils {
         checkChanged(Side.NORTH, true, changed);
         checkModel(after, 4, 0, prevBoard, Side.NORTH);
     }
+    public void testQudraTiles() {
+        int[][] before = new int[][] {
+                {0, 0, 0, 4},
+                {0, 0, 0, 8},
+                {0, 0, 4, 8},
+                {0, 0, 0, 8}
+        };
+        int[][] after = new int[][] {
+                {0, 0, 4, 4},
+                {0, 0, 0, 16},
+                {0, 0, 0, 8},
+                {0, 0, 0, 0},
+        };
+        updateModel(before, 0, 0, false);
+        String prevBoard = model.toString();
+        boolean changed = model.tilt(Side.NORTH);
+        checkChanged(Side.NORTH, true, changed);
+        checkModel(after, 8, 0, prevBoard, Side.NORTH);
+    }
 }
