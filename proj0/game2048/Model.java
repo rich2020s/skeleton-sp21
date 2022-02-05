@@ -112,7 +112,6 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-//        board.setViewingPerspective(side);
         int size = board.size();
         for (int c = 0; c < size; c++) {
             int mergeCounter = 0;
@@ -131,22 +130,21 @@ public class Model extends Observable {
                             mergeCounter += 1;
                             changed = true;
                         } else {
-                            while(mergeCounter < size - 1) {
+                            boolean run = true;
+                            while (run) {
                                 mergeCounter += 1;
                                 dCol = side.col(c, size - 1 - mergeCounter, size);
                                 dRow = side.row(c, size - 1 - mergeCounter, size);
-                                if (tile(dCol, dRow) == null ) {
+                                if (tile(dCol, dRow) == null || tile(dCol, dRow).value() == t.value()) {
+                                    if (dCol == tCol && dRow == tRow) {
+                                        break;
+                                    }
+                                    run = false;
                                     board.move(dCol, dRow, t);
                                     changed = true;
-                                    break;
                                 }
-                                if (tile(dCol, dRow).value() == t.value()) {
-                                    board.move(dCol, dRow, t);
-                                    changed = true;
+                                if (mergeCounter == size - 1) {
                                     break;
-                                }
-                                if (mergeCounter == size - 2) {
-                                    return false;
                                 }
                             }
                         }
